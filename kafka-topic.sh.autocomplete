@@ -1,5 +1,6 @@
 #!/bin/bash
 
+. ./helpers.sh
 
 all_types="--alter|--at-min-isr-partitions|--bootstrap-server|--command-config|--config|--create|--delete|--delete-config\
 |--describe|--disable-rack-aware|--exclude-internal|--force|--help|--if-exists|--if-not-exists\
@@ -15,25 +16,6 @@ configs="cleanup.policy=|compression.type=|delete.retention.ms=|file.delete.dela
 |min.insync.replicas=|preallocate=|retention.bytes=|retention.ms=|segment.bytes=|segment.index.bytes=\
 |segment.jitter.ms=|segment.ms=|unclean.leader.election.enable="
 
-_get_value() {
-    local option="$1"
-    shift
-    local array=("$@")
-    local foundOption=false
-
-    for element in "${array[@]}"; do
-        $foundOption && {
-            [[ "$element" == "=" ]] && continue # ignore equals in --key=value syntax
-                    echo "$element"
-                    return 
-                }
-            [[ "$element" == "$option" ]] && { foundOption=true; }
-        done
-    }
-
-_get_topics() {
-    kafka-topics.sh --bootstrap-server "$1" --list 2>/dev/null
-}
 
 _kafka_topics_complete() {
     COMP_WORDBREAKS=${COMP_WORDBREAKS//:} #don't split command on a colon (e.g. on localhost:9092)
@@ -55,28 +37,19 @@ _kafka_topics_complete() {
                 ;;
 
             '--topic')
-                # see if we've a credible bootstrap server in the argument list
-                local bs=$(_get_value --bootstrap-server "${COMP_WORDS[@]}")
-
-                # check we've received something and it's a credible host:port otherwise try the variable
-                if [[ "$element" =~ ^[^[:space:]]*:[0-9]+$ && ! -z "$KAFKA_BOOTSTRAP_SERVER" ]]; then
-                    bs="$KAFKA_BOOTSTRAP_SERVER"
-                fi
-
-                # if we've found a bootstrap server, query the topics
-                if [[ ! -z "$bs" ]]; then
-                    candidates="$(_get_topics "$bs")"
-                fi
+                    candidates="$(_get_topics)"
                 ;;
 
             '--config' | '--delete-config')
                 compopt -o nospace # don't stick a space after the config=
                 candidates="$configs"
                 ;;
+
                 #https://stackoverflow.com/a/13254908/591948
                 @($types_with_args))
                 # no suggestions - type needs an arg of some kind
                 ;; 
+
             *)
                 # it's a regular cmd option starting with -
                 if [[ ${cur_word} == -* ]] ; then
