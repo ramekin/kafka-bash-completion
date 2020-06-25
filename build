@@ -1,0 +1,96 @@
+#!/bin/bash
+
+output_file=kafka-bash-completion
+installation_dir=/etc/bash_completion.d
+
+_concat_files() {
+    echo '# vi:ft=bash'
+
+    echo
+
+    # Print the license
+    sed 's/^/# /' LICENSE
+
+    # Print the Doc
+    echo
+    echo '# This script provides bash autocompletion for the following Kafka commands:'
+    for f in *.autocomplete; do
+        echo -e "#\t${f%.autocomplete}"
+    done
+    echo -e "\n# The environment variables \n# KAFKA_BOOTSTRAP_SERVER and KAFKA_BROKER_LIST\n# can optionally be set to be used as completion suggestions"
+
+    # print the helpers
+    echo
+    echo "####################"
+    echo "# Helper Functions #"
+    echo "####################"
+    cat helpers.sh
+
+    # print the functions
+    echo
+    echo "########################"
+    echo "# Completion Functions #"
+    echo "########################"
+
+    for f in *.autocomplete; do
+        #local cmd=${f%.sh.autocomplete}
+        local cmdsh=${f%.autocomplete}
+        #local fn="_${cmd//-/_}_complete"
+
+        echo -e "\n# Completion for ${f%.autocomplete}"
+        sed '/#\s*INCLUDE/,/#\s*END_INCLUDE/!d;//d' $f
+    done
+
+    # wire them up
+    echo 
+    for f in *.autocomplete; do
+        local cmd=${f%.sh.autocomplete}
+        local cmdsh=${f%.autocomplete}
+        local fn="_${cmd//-/_}_complete"
+
+        echo "complete -F $fn $cmdsh"
+        echo "complete -F $fn $cmd"
+    done
+
+} > $output_file
+
+build() {
+    _concat_files > $output_file
+}
+
+clean() {
+    rm $output_file
+}
+
+install() {
+    [[ -f $output_file ]] && {
+        echo "Copying $output_file to $installation_dir"
+            cp $output_file $installation_dir 
+        } 
+}
+
+usage() {
+    echo "Usage: $0 [--build|--clean|--install|--help]"
+}
+
+case ${1:-'-b'} in
+    --makefile)
+        _concat_files
+        ;;
+    -c|--clean)
+        clean
+        ;;
+    -h|--help)
+        usage
+        ;;
+    -b|--build)
+        build
+        ;;
+    -i|--install)
+        install
+        ;;
+    *)
+        usage
+        ;;
+esac
+

@@ -1,8 +1,5 @@
-#!/bin/bash
-
-
 _get_value() {
-    local option="$1"
+    local pattern="$1"
     shift
     local array=("$@")
     local foundOption=false
@@ -13,14 +10,13 @@ _get_value() {
                     echo "$element"
                     return 
                 }
-            [[ "$element" == "$option" ]] && { foundOption=true; }
+            [[ "$element" =~ $pattern ]] && { foundOption=true; }
         done
     }
 
 _get_bootstrap_server() {
-    # see if we've a bootstrap server value in the argument list
-    local bs=$(_get_value --bootstrap-server "${COMP_WORDS[@]}")
-
+    # see if we've a bootstrap server or broker-list value in the argument list
+    local bs=$(_get_value '^(--bootstrap-server|--broker-list)$' "${words[@]}" | cut -f1 -d',')
     # check we've received something and it's a credible host:port otherwise try the env variable
     if [[ "$bs" =~ [^[:space:]]*:[0-9]+$ ]]; then
       echo "$bs"

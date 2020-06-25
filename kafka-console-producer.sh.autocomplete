@@ -1,0 +1,44 @@
+# vi: ft=bash
+. ./helpers.sh
+
+#INCLUDE
+_kafka_console_producer_complete() {
+
+    local all_types='--batch-size|--broker-list|--compression-codec|--help|--line-reader|--max-block-ms|--max-memory-bytes|--max-partition-memory-bytes|--message-send-max-retries|--metadata-expiry-ms|--producer-property|--producer.config|--property|--request-required-acks|--request-timeout-ms|--retry-backoff-ms|--socket-buffer-size|--sync|--timeout|--topic|--version'
+    local types_with_args='--batch-size|--broker-list|--line-reader|--max-block-ms|--max-memory-bytes|--max-partition-memory-bytes|--message-send-max-retries|--metadata-expiry-ms|--producer-property|--producer.config|--property|--request-required-acks|--request-timeout-ms|--retry-backoff-ms|--socket-buffer-size|--timeout|--topic'
+
+    local cur prev words cword candidates
+    _init_completion -n : # and don't split on a colon
+
+    case "$prev" in
+
+        '--broker-list')
+            candidates=${KAFKA_BROKER_LIST:-${KAFKA_BOOTSTRAP_SERVER:-'localhost:9092'}}
+            ;;
+
+        '--compression-codec')
+            candidates='gzip|snappy|lz4|zstd'
+            ;;
+
+        '--topic')
+            candidates="$(_get_topics)"
+            ;;
+
+            #https://stackoverflow.com/a/13254908/591948
+            @($types_with_args))
+            # no suggestions - type needs an arg of some kind
+            ;; 
+
+        *)
+            # it's a regular cmd option starting with -
+            if [[ ${cur} == -* ]] ; then
+                candidates="$all_types"
+            fi
+    esac
+
+    [[ ! -z "$candidates" ]] && COMPREPLY=($(IFS=$' \t\n|' compgen  -W "$candidates" -- ${cur}) )
+    return 0
+}
+#END_INCLUDE
+
+complete -F _kafka_console_producer_complete kafka-console-producer.sh

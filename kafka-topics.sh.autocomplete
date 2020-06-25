@@ -1,0 +1,48 @@
+# vi: ft=bash
+. ./helpers.sh
+
+#INCLUDE
+_kafka_topics_complete() {
+
+    local all_types='--alter|--at-min-isr-partitions|--bootstrap-server|--command-config|--config|--create|--delete|--delete-config|--describe|--disable-rack-aware|--exclude-internal|--force|--help|--if-exists|--if-not-exists|--list|--partitions|--replica-assignment|--replication-factor|--topic|--topics-with-overrides|--unavailable-partitions|--under-min-isr-partitions|--under-replicated-partitions|--version|--zookeeper'
+    local types_with_args='--bootstrap-server|--command-config|--config|--delete-config|--partitions|--replica-assignment|--replication-factor|--topic|--zookeeper'
+    local configs='cleanup.policy=|compression.type=|delete.retention.ms=|file.delete.delay.ms=|flush.messages=|flush.ms=|follower.replication.throttled.replicas=|index.interval.bytes=|leader.replication.throttled.replicas=|max.compaction.lag.ms=|max.message.bytes=|message.downconversion.enable=|message.format.version=|message.timestamp.difference.max.ms=|message.timestamp.type=|min.cleanable.dirty.ratio=|min.compaction.lag.ms=|min.insync.replicas=|preallocate=|retention.bytes=|retention.ms=|segment.bytes=|segment.index.bytes=|segment.jitter.ms=|segment.ms=|unclean.leader.election.enable='
+
+    local cur prev words cword candidates
+   _init_completion -n : # and don't split on a colon
+
+    case "$prev" in
+
+        '--bootstrap-server')
+
+            candidates=${KAFKA_BOOTSTRAP_SERVER:-'localhost:9092'}
+            ;;
+
+        '--topic')
+            candidates="$(_get_topics)"
+            ;;
+
+        '--config' | '--delete-config')
+            compopt -o nospace # don't stick a space after the config=
+            candidates="$configs"
+            ;;
+
+        #https://stackoverflow.com/a/13254908/591948
+        @($types_with_args))
+            # no suggestions - type needs an arg of some kind
+        ;; 
+
+        *)
+            # it's a regular cmd option starting with -
+            if [[ ${cur} == -* ]] ; then
+                candidates="$all_types"
+            fi
+            ;;
+    esac
+
+    [[ ! -z "$candidates" ]] && COMPREPLY=($(IFS=$' \t\n|' compgen  -W "$candidates" -- ${cur}) )
+    return 0
+}
+# END_INCLUDE
+
+complete -F _kafka_topics_complete kafka-topics.sh

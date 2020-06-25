@@ -1,65 +1,58 @@
-#!/bin/bash
+# vi: ft=bash
 . ./helpers.sh
 
-all_types="--bootstrap-server|--consumer-property|--consumer.config|--enable-systest-events|--formatter|--from-beginning|--group|--help|--isolation-level|--key-deserializer|--max-messages|--offset|--partition|--property|--skip-message-on-error|--timeout-ms|--topic|--value-deserializer|--version|--whitelist"
-types_with_args="--bootstrap-server|--consumer-property|--consumer.config |--formatter|--group|--isolation-level|--key-deserializer|--max-messages|--offset|--partition|--property|--timeout-ms |--topic|--value-deserializer|--whitelist"
-
-
+#INCLUDE
 _kafka_console_consumer_complete() {
 
-    COMP_WORDBREAKS=${COMP_WORDBREAKS//:} #don't split command on a colon (e.g. on localhost:9092)
-    COMPREPLY=() # default
+    local all_types="--bootstrap-server|--consumer-property|--consumer.config|--enable-systest-events|--formatter|--from-beginning|--group|--help|--isolation-level|--key-deserializer|--max-messages|--offset|--partition|--property|--skip-message-on-error|--timeout-ms|--topic|--value-deserializer|--version|--whitelist"
+    local types_with_args="--bootstrap-server|--consumer-property|--consumer.config |--formatter|--group|--isolation-level|--key-deserializer|--max-messages|--offset|--partition|--property|--timeout-ms |--topic|--value-deserializer|--whitelist"
 
-        local cur_word prev_word candidates
+    local cur prev words cword candidates
+    _init_completion -n : # and don't split on a colon
 
-        cur_word="${COMP_WORDS[COMP_CWORD]}"
-        prev_word="${COMP_WORDS[COMP_CWORD-1]}"
+    case "$prev" in
 
-        case "$prev_word" in
+        '--bootstrap-server')
+            candidates=${KAFKA_BOOTSTRAP_SERVER:-localhost:9092}
+            ;;
 
-            '--bootstrap-server')
-                candidates=$KAFKA_BOOTSTRAP_SERVER
+        '--group')
+            candidates="$(_get_consumer_groups)"
+            ;;
 
-                if [[ -z $candidates ]]; then
-                    candidates=localhost:9092
-                fi
-                ;;
+        '--isolation-level')
+            candidates="read_committed|read_uncommitted"
+            ;;
 
-            '--topic')
-                    candidates="$(_get_topics)"
-                ;;
+        '--offset')
+            candidates="earliest|latest"
+            ;;
 
-            '--group')
-                    candidates="$(_get_consumer_groups)"
-                ;;
+        '--property')
+            compopt -o nospace # don't stick a space after the config=
+            candidates="print.timestamp=|print.key=|print.value=|key.separator=|line.separator=|key.deserializer=|value.deserializer="
+            ;;
 
-            '--isolation-level')
-                    candidates="read_committed|read_uncommitted"
-                ;;
-            '--offset')
-                    candidates="earliest|latest"
-                ;;
+        '--topic')
+            candidates="$(_get_topics)"
+            ;;
 
-            '--property')
-                   compopt -o nospace # don't stick a space after the config=
-                   candidates="print.timestamp=|print.key=|print.value=|key.separator=|line.separator=|key.deserializer=|value.deserializer="
+            #https://stackoverflow.com/a/13254908/591948
+            @($types_with_args))
+            # no suggestions - type needs an arg of some kind
+            ;; 
 
-                ;;
-
-                #https://stackoverflow.com/a/13254908/591948
-                @($types_with_args))
-                # no suggestions - type needs an arg of some kind
-                ;; 
-
-            *)
-                # it's a regular cmd option starting with -
-                if [[ ${cur_word} == -* ]] ; then
-                    candidates="$all_types"
-                fi
+        *)
+            # it's a regular cmd option starting with -
+            if [[ ${cur} == -* ]] ; then
+                candidates="$all_types"
+            fi
+            ;;
         esac
 
-        [[ ! -z "$candidates" ]] && COMPREPLY=($(IFS=$' \t\n|' compgen  -W "$candidates" -- ${cur_word}) )
+        [[ ! -z "$candidates" ]] && COMPREPLY=($(IFS=$' \t\n|' compgen  -W "$candidates" -- ${cur}) )
         return 0
     }
+#END_INCLUDE
 
 complete -F _kafka_console_consumer_complete kafka-console-consumer.sh
