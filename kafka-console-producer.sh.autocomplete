@@ -13,7 +13,7 @@ _kafka_console_producer_complete() {
     case "$prev" in
 
         '--broker-list')
-            candidates=${KAFKA_BROKER_LIST:-${KAFKA_BOOTSTRAP_SERVER:-'localhost:9092'}}
+            candidates="${KAFKA_BROKER_LIST:-${KAFKA_BOOTSTRAP_SERVER:-localhost:9092}}"
             ;;
 
         '--compression-codec')

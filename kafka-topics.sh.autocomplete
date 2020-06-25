@@ -15,7 +15,7 @@ _kafka_topics_complete() {
 
         '--bootstrap-server')
 
-            candidates=${KAFKA_BOOTSTRAP_SERVER:-'localhost:9092'}
+            candidates="${KAFKA_BOOTSTRAP_SERVER:-localhost:9092}"
             ;;
 
         '--topic')

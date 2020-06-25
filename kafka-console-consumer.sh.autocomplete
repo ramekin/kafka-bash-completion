@@ -4,8 +4,8 @@
 #INCLUDE
 _kafka_console_consumer_complete() {
 
-    local all_types="--bootstrap-server|--consumer-property|--consumer.config|--enable-systest-events|--formatter|--from-beginning|--group|--help|--isolation-level|--key-deserializer|--max-messages|--offset|--partition|--property|--skip-message-on-error|--timeout-ms|--topic|--value-deserializer|--version|--whitelist"
-    local types_with_args="--bootstrap-server|--consumer-property|--consumer.config |--formatter|--group|--isolation-level|--key-deserializer|--max-messages|--offset|--partition|--property|--timeout-ms |--topic|--value-deserializer|--whitelist"
+    local all_types='--bootstrap-server|--consumer-property|--consumer.config|--enable-systest-events|--formatter|--from-beginning|--group|--help|--isolation-level|--key-deserializer|--max-messages|--offset|--partition|--property|--skip-message-on-error|--timeout-ms|--topic|--value-deserializer|--version|--whitelist'
+    local types_with_args='--bootstrap-server|--consumer-property|--consumer.config |--formatter|--group|--isolation-level|--key-deserializer|--max-messages|--offset|--partition|--property|--timeout-ms |--topic|--value-deserializer|--whitelist'
 
     local cur prev words cword candidates
     _init_completion -n : # and don't split on a colon
@@ -13,7 +13,7 @@ _kafka_console_consumer_complete() {
     case "$prev" in
 
         '--bootstrap-server')
-            candidates=${KAFKA_BOOTSTRAP_SERVER:-localhost:9092}
+            candidates="${KAFKA_BOOTSTRAP_SERVER:-localhost:9092}"
             ;;
 
         '--group')
@@ -21,16 +21,16 @@ _kafka_console_consumer_complete() {
             ;;
 
         '--isolation-level')
-            candidates="read_committed|read_uncommitted"
+            candidates='read_committed|read_uncommitted'
             ;;
 
         '--offset')
-            candidates="earliest|latest"
+            candidates='earliest|latest'
             ;;
 
         '--property')
             compopt -o nospace # don't stick a space after the config=
-            candidates="print.timestamp=|print.key=|print.value=|key.separator=|line.separator=|key.deserializer=|value.deserializer="
+            candidates='print.timestamp=|print.key=|print.value=|key.separator=|line.separator=|key.deserializer=|value.deserializer='
             ;;
 
         '--topic')
