@@ -37,6 +37,6 @@ _get_consumer_groups() {
     # if we've found a bootstrap server, query the groups
     local bs=$(_get_bootstrap_server)
     if [[ ! -z "$bs" ]]; then
-        kafka-consumer-groups.sh --bootstrap-server "$bs" --list 
+        kafka-consumer-groups.sh --bootstrap-server "$bs" --list 2>/dev/null
     fi
 }
