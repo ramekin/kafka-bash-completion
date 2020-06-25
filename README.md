@@ -25,12 +25,10 @@ sudo ./build  --install
 
 ## Usage
 After restarting your terminal (or soucing the `kafka-bash-completion` script) 
-    you should be able to generate completion suggestions for the listed kafka commands by pressing <Tab> (once or more).
+    you should be able to generate completion suggestions for the listed kafka commands by pressing the **\<Tab\>** key once or more.
 
 Suggestions for the **--topic** and **--group** options are queried from Kafka (which isn't particularly quick)
 
-Environment variables **KAFKA_BOOTSTRAP_SERVER** and **KAFKA_BROKER_LIST** can be set in order to populate suggestions for the **--bootstrap-server** and **--broker-list** fields.
+Environment variables **KAFKA_BOOTSTRAP_SERVER** and **KAFKA_BROKER_LIST** can be set in order to populate suggestions for the **--bootstrap-server** and **--broker-list** option values.
 
-They are also used as a fallback when querying Kafka for groups and topics
-
-
+They are also used as a fallback when trying to query Kafka for groups and topics.
