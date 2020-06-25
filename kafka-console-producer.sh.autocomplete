@@ -20,6 +20,10 @@ _kafka_console_producer_complete() {
             candidates='gzip|snappy|lz4|zstd'
             ;;
 
+        '--producer.config')
+            compopt -o default # auto-complete with files
+            ;;
+
         '--topic')
             candidates="$(_get_topics)"
             ;;

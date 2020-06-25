@@ -22,9 +22,17 @@ _kafka_topics_complete() {
             candidates="$(_get_topics)"
             ;;
 
-        '--config' | '--delete-config')
+        '--config')
             compopt -o nospace # don't stick a space after the config=
             candidates="$configs"
+            ;;
+
+        '--command-config')
+            compopt -o default # auto-complete with files
+            ;;
+
+        '--delete-config')
+            candidates="${configs//=}" # remove the equalses from the candidates
             ;;
 
         #https://stackoverflow.com/a/13254908/591948

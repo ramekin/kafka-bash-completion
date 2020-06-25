@@ -16,6 +16,10 @@ _kafka_console_consumer_complete() {
             candidates="${KAFKA_BOOTSTRAP_SERVER:-localhost:9092}"
             ;;
 
+        '--consumer.config')
+            compopt -o default # auto-complete with files
+            ;;
+
         '--group')
             candidates="$(_get_consumer_groups)"
             ;;
