@@ -1,5 +1,3 @@
-OF=kafka-bash-completion
-ID=/etc/bash_completion.d
 
 build: kafka-bash-completion
 kafka-bash-completion:
@@ -7,5 +5,5 @@ kafka-bash-completion:
 clean:
 	rm kafka-bash-completion
 install: build
-	cp $(OF) $(ID)
+	./build --install
 

@@ -63,6 +63,7 @@ clean() {
 }
 
 install() {
+    [[ -d $installation_dir ]] || { echo "$installation_dir directory not found - is the bash-completion package installed?" >&2; exit 1; }
     [[ -f $output_file ]] && {
         echo "Copying $output_file to $installation_dir"
             cp $output_file $installation_dir 
