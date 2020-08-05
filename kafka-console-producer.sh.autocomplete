@@ -2,13 +2,24 @@
 . ./helpers.sh
 
 #INCLUDE
+
+__my_init_completion() {
+    COMPREPLY=()
+    _get_comp_words_by_ref cur prev words cword
+}
+
 _kafka_console_producer_complete() {
 
     local all_types='--batch-size|--broker-list|--compression-codec|--help|--line-reader|--max-block-ms|--max-memory-bytes|--max-partition-memory-bytes|--message-send-max-retries|--metadata-expiry-ms|--producer-property|--producer.config|--property|--request-required-acks|--request-timeout-ms|--retry-backoff-ms|--socket-buffer-size|--sync|--timeout|--topic|--version'
     local types_with_args='--batch-size|--broker-list|--line-reader|--max-block-ms|--max-memory-bytes|--max-partition-memory-bytes|--message-send-max-retries|--metadata-expiry-ms|--producer-property|--producer.config|--property|--request-required-acks|--request-timeout-ms|--retry-backoff-ms|--socket-buffer-size|--timeout|--topic'
 
     local cur prev words cword candidates
-    _init_completion -n : # and don't split on a colon
+
+    if declare -F _init_completions >/dev/null 2>&1; then
+        _init_completion -n : || return    #Don't split on colon
+    else
+        __my_init_completion || return
+    fi
 
     case "$prev" in
 

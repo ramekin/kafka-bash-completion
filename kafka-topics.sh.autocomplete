@@ -2,6 +2,12 @@
 . ./helpers.sh
 
 #INCLUDE
+
+__my_init_completion() {
+    COMPREPLY=()
+    _get_comp_words_by_ref cur prev words cword
+}
+
 _kafka_topics_complete() {
 
     local all_types='--alter|--at-min-isr-partitions|--bootstrap-server|--command-config|--config|--create|--delete|--delete-config|--describe|--disable-rack-aware|--exclude-internal|--force|--help|--if-exists|--if-not-exists|--list|--partitions|--replica-assignment|--replication-factor|--topic|--topics-with-overrides|--unavailable-partitions|--under-min-isr-partitions|--under-replicated-partitions|--version|--zookeeper'
@@ -9,7 +15,12 @@ _kafka_topics_complete() {
     local configs='cleanup.policy=|compression.type=|delete.retention.ms=|file.delete.delay.ms=|flush.messages=|flush.ms=|follower.replication.throttled.replicas=|index.interval.bytes=|leader.replication.throttled.replicas=|max.compaction.lag.ms=|max.message.bytes=|message.downconversion.enable=|message.format.version=|message.timestamp.difference.max.ms=|message.timestamp.type=|min.cleanable.dirty.ratio=|min.compaction.lag.ms=|min.insync.replicas=|preallocate=|retention.bytes=|retention.ms=|segment.bytes=|segment.index.bytes=|segment.jitter.ms=|segment.ms=|unclean.leader.election.enable='
 
     local cur prev words cword candidates
-   _init_completion -n : # and don't split on a colon
+
+    if declare -F _init_completions >/dev/null 2>&1; then
+        _init_completion -n : || return    #Don't split on colon
+    else
+        __my_init_completion || return
+    fi
 
     case "$prev" in
 

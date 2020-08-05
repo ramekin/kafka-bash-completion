@@ -1,7 +1,6 @@
 #!/bin/bash
 
 output_file=kafka-bash-completion
-installation_dir=/etc/bash_completion.d
 
 _concat_files() {
     echo '# vi:ft=bash'
@@ -63,7 +62,14 @@ clean() {
 }
 
 install() {
-    [[ -d $installation_dir ]] || { echo "$installation_dir directory not found - is the bash-completion package installed?" >&2; exit 1; }
+    if [[ -d /etc/bash_completion.d ]]; then
+        installation_dir=/etc/bash_completion.d
+    elif [[ -d /usr/local/etc/bash_completion.d ]]; then
+        installation_dir=/usr/local/etc/bash_completion.d
+    else
+        echo "Could not find bash_completion.d directory. Is the bash-completion package installed?" 1>&2
+        exit 1
+    fi
     [[ -f $output_file ]] && {
         echo "Copying $output_file to $installation_dir"
             cp $output_file $installation_dir 
